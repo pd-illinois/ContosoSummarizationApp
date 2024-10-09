@@ -1,0 +1,326 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Contoso Summarization with AI</title>  
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">  
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">  
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+
+    
+
+</head>  
+<body class="bg-gray-100 flex">  
+
+    <div id="sidebar" class="sidebar bg-white h-screen shadow-lg expanded">  
+        <div class="flex items-center justify-between p-4">  
+            <span class="text-xl font-bold">Main Menu</span>  
+            <button id="toggleBtn" class="focus:outline-none">  
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">  
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />  
+                </svg>  
+            </button>  
+        </div>  
+        <nav class="mt-4">  
+            <a href="#" class="flex items-center p-2 hover:bg-gray-200">  
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="icons w-8 h-8">  
+                    <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z" clip-rule="evenodd" />  
+                </svg>    
+                <span class="ml-2">Home</span>  
+            </a>  
+            <a href="#" class="flex items-center p-2 hover:bg-gray-200" onclick="toggleBooks()">  
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="icons w-8 h-8">
+                    <path d="M7.25 3.688a8.035 8.035 0 0 0-4.872-.523A.48.48 0 0 0 2 3.64v7.994c0 .345.342.588.679.512a6.02 6.02 0 0 1 4.571.81V3.688ZM8.75 12.956a6.02 6.02 0 0 1 4.571-.81c.337.075.679-.167.679-.512V3.64a.48.48 0 0 0-.378-.475 8.034 8.034 0 0 0-4.872.523v9.268Z" />
+                  </svg>           
+                <span class="ml-2">Select Book</span>  
+            </a>  
+            <div id="bookList" class="p-2 bg-white shadow-md rounded w-84">  
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">  
+                    <input type="file" name="book" class="border rounded p-2 mt-2 flex" />  
+                    <button id="uploadbtn" class="btnconfig rounded-lg" type="submit">Upload</button>  
+                </form>  
+                <h3 class="mt-4">Uploaded Books</h3>  
+                <form method="POST" action="{{ url_for('fetch_summary') }}">  
+                    <div class="border rounded mt-2 p-2 h-250 overflow-y-auto">  
+                        <ul id="subbookList">  
+                            {% for book in uploaded_books %}  
+                                <li>  
+                                    <input type="radio" name="selected_book" value="{{ book }}" id="{{ book }}" {% if selected_book == book %}checked{% endif %} />  
+                                    <label for="{{ book }}">{{ book }}</label>  
+                                </li>  
+                            {% endfor %}  
+                        </ul>  
+                    </div>  
+
+                    <button type="button" class="btnconfig rounded-lg p-2 mt-2" id="summarizeButton">Summarize Selected Book</button>
+                    <div id="spinner2" class="spinner2" style="display: none;">  
+                        <img src="{{ url_for('static', filename='dancing_penguin.gif') }}" alt="Loading..."/>
+                        <span>Summary Loading...</span>  
+                        <span id="timer2" style="display: none;">Time : 0s</span> <!-- Timer Element -->
+                    </div>  
+                    <button type="button" class="btnconfig rounded-lg p-2 mt-2" id="generateChatButton">Generate Chat</button>  
+      
+
+                    <div id="spinner3" class="spinner3" style="display: none;">  
+                        <img src="{{ url_for('static', filename='dancing_penguin.gif') }}" alt="Loading..."/>
+                        <span>Building Chat...</span>  
+                        <span id="timer3" style="display: none;">Time : 0s</span> <!-- Timer Element -->
+                    </div>  
+
+                      
+                    <div id="chatMessage" style="display:none;"></div> 
+
+                </form>  
+            </div>  
+            
+            <a href="#" class="flex items-center p-2 hover:bg-gray-200" onclick="toggleSettings()">  
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="icons w-8 h-8">
+                    <path d="M6.5 2.25a.75.75 0 0 0-1.5 0v3a.75.75 0 0 0 1.5 0V4.5h6.75a.75.75 0 0 0 0-1.5H6.5v-.75ZM11 6.5a.75.75 0 0 0-1.5 0v3a.75.75 0 0 0 1.5 0v-.75h2.25a.75.75 0 0 0 0-1.5H11V6.5ZM5.75 10a.75.75 0 0 1 .75.75v.75h6.75a.75.75 0 0 1 0 1.5H6.5v.75a.75.75 0 0 1-1.5 0v-3a.75.75 0 0 1 .75-.75ZM2.75 7.25H8.5v1.5H2.75a.75.75 0 0 1 0-1.5ZM4 3H2.75a.75.75 0 0 0 0 1.5H4V3ZM2.75 11.5H4V13H2.75a.75.75 0 0 1 0-1.5Z" />
+                  </svg>                               
+                <span class="ml-2">Settings</span>  
+            </a> 
+            <div id="settings" class="hidden p-2 bg-white shadow-md rounded p-4 w-84">  
+                <ul>
+                    <li>Summary Settings</li>
+                    <li>Chat Settings</li>
+                    <li>Configurations</li>
+                </ul>
+            </div> 
+            <a href="#" class="flex items-center p-2 hover:bg-gray-200">  
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="icons w-8 h-8">
+                    <path fill-rule="evenodd" d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0ZM9 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6.75 8a.75.75 0 0 0 0 1.5h.75v1.75a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8.25 8h-1.5Z" clip-rule="evenodd" />
+                  </svg>                                 
+                <span class="ml-2">About</span>  
+            </a>  
+        </nav>  
+    </div>
+    <div class="flex-1 p-4">
+        <!-- Navbar --> 
+        <nav class="bg-white shadow-md mt-1 rounded-lg">  
+            <div class="container mx-auto flex items-center p-4">  
+                <div class="flex items-center">  
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="h-15 w-40 mr-2">  
+                </div>  
+                <h1 class="text-2xl text-gray-700 hover:text-blue-500 flex-grow text-center">Contoso Book Summarization with AI</h1>  
+            </div>  
+        </nav>  
+        <!--nav bar end-->
+
+        <!--<div id="main" class="main grid grid-cols-3 gap-4 mt-5 flex">  -->
+        <div id="main" class="main rounded grid grid-cols-2 gap-4 mt-4 flex">
+              <div id="summary" class="summary border rounded p-2 w-full">
+                    <div class="flex items-center justify-between">  
+                        <h2 class="font-semibold">Book Summary: <span id="selectedBookName"></span></h2>  
+                        <button id="exportSummaryButton" class="btnconfig rounded-lg p-2 ml-4" onclick="exportSummary()">Export Summary</button>  
+                        <button id="toggleButton_chat" onclick="toggleChat()">Expand Summary</button>
+                    </div>  
+                    <div class="grid grid-cols-2 gap-4 mt-2">  
+                        <div class="border rounded p-4">  
+                            <strong>Title:</strong><br>  
+                            <span class="summary-title"></span>  
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Author:</strong><br>  
+                            <span class="summary-author"></span>  
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Synopsis:</strong><br> 
+                            <button id="toggleButton_syn" onclick="toggleSummary_syn()">+</button>
+                            <div id="summaryText_syn" style="display: none;">  
+                            <span class="summary-synopsis"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Characters:</strong><br> 
+                            <button id="toggleButton_char" onclick="toggleSummary_char()">+</button>
+                            <div id="summaryText_char" style="display: none;">   
+                            <span class="summary-characters"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Reading Age:</strong><br>
+                            <button id="toggleButton_ra" onclick="toggleSummary_ra()">+</button>
+                            <div id="summaryText_ra" style="display: none;">   
+                            <span class="summary-reading-age"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Audience:</strong><br>  
+                            <button id="toggleButton_aud" onclick="toggleSummary_aud()">+</button>
+                            <div id="summaryText_aud" style="display: none;"> 
+                            <span class="summary-audience"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Tone:</strong><br>  
+                            <button id="toggleButton_tone" onclick="toggleSummary_tone()">+</button>
+                            <div id="summaryText_tone" style="display: none;"> 
+                            <span class="summary-tone"></span> 
+                            </div>   
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Themes:</strong><br>  
+                            <button id="toggleButton_theme" onclick="toggleSummary_theme()">+</button>
+                            <div id="summaryText_theme" style="display: none;"> 
+                            <span class="summary-themes"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Genres:</strong><br>  
+                            <button id="toggleButton_gen" onclick="toggleSummary_gen()">+</button>
+                            <div id="summaryText_gen" style="display: none;"> 
+                            <span class="summary-genres"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Reading Guides:</strong><br>  
+                            <button id="toggleButton_rg" onclick="toggleSummary_rg()">+</button>
+                            <div id="summaryText_rg" style="display: none;"> 
+                            <span class="summary-reading-guides"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Teaching Guides:</strong><br>  
+                            <button id="toggleButton_tg" onclick="toggleSummary_tg()">+</button>
+                            <div id="summaryText_tg" style="display: none;"> 
+                            <span class="summary-teaching-guides"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Book Index:</strong><br>  
+                            <button id="toggleButton_bi" onclick="toggleSummary_bi()">+</button>
+                            <div id="summaryText_bi" style="display: none;"> 
+                            <span class="summary-bookindex"></span>  
+                            </div>
+                        </div>  
+                        <div class="border rounded p-4">  
+                            <strong>Single Tagline:</strong><br>  
+                            <button id="toggleButton_st" onclick="toggleSummary_st()">+</button>
+                            <div id="summaryText_st" style="display: none;"> 
+                            <span class="summary-singletagline"></span>
+                            </div>  
+                        </div> 
+
+                        
+                        <div class="border rounded p-4">  
+                            <strong>Full Plot Summary :</strong><br>  
+                            <button id="toggleButton" onclick="toggleSummary()">+</button>  
+                            <div id="summaryText" style="display: none;">  
+                                <span class="summary-fullplotsummary"></span>  
+                            </div>  
+                        </div>  
+                        <!--my code end-->
+                        <div class="border rounded p-4">  
+                            <strong>Summary Date:</strong><br>  
+                            <span class="summary-date"></span>  
+                        </div>
+                    </div> 
+            </div> 
+
+            <div id="chat" class="chat border rounded p-2 w-full">
+                <div class="flex justify-between items-center"> 
+                    <h2 class="font-semibold mt-2">Chat with Selected Book: <span id="selectedBookName_chat" class="ml-2"></span></h2>
+                    
+                </div>
+
+                <div id="chat-board" class="chat-board border rounded mt-2 p-2">  
+                    <input type="text" id="userQuestion" class="border rounded p-2 w-full" placeholder="Ask Question" />  
+                    <div class="flex mt-2">
+                        <button id="sendButton" class="sendButton rounded-lg">Send</button> 
+                        <div class="flex items-center ml-4">
+                            <label class="mr-2">
+                                <input type="radio" name="searchType" value="local"> Local Search
+                            </label>
+                            <label>
+                                <input type="radio" name="searchType" value="global" checked> Global Search
+                            </label>
+                        </div>
+                        <div id="spinner1" class="spinner1" style="display: none;">  
+                            <img src="{{ url_for('static', filename='dancing_penguin.gif') }}" alt="Loading..."/>
+                            <span>Fetching Answer...</span>  
+                        </div> 
+                    </div>
+                     
+
+ 
+                    <div id="responsedetails" class="response-details mt-2 border rounded p-2 w-full">Response Details : </div> 
+                    <div id="chatResponse" class="chat-response-text mt-2 border rounded p-2 w-full">Answer : </div> 
+                    <div id="contextReports" class="context-reports mt-2 border rounded p-2 w-full">Citations : </div> <!-- New div for context reports -->
+                </div>
+
+
+        </div>  
+
+
+    </div>
+
+<script>  
+        const createIndexUrl = "{{ url_for('create_index') }}";  
+  
+        $(document).ready(function() {  
+            $('#generateChatButton').click(function() {  
+                const selectedBook = $('input[name="selected_book"]:checked').val();  
+                if (!selectedBook) {  
+                    alert('Please select a book.');  
+                    return;  
+                }  
+
+                        // Show the spinner  
+                const spinner = document.getElementById('spinner3');  
+                spinner.style.display = 'flex'; 
+                        // Start the timer  
+                let startTime = Date.now();  
+                const timerElement = document.getElementById('timer3');  
+                timerElement.innerText = 'Time Taken: 0s';  
+                timerElement.style.display = 'inline'; // Show the timer 
+
+                const timerInterval = setInterval(() => {  
+                const elapsedMilliseconds = Date.now() - startTime;
+                const elapsedMinutes = Math.floor(elapsedMilliseconds / 60000);
+                const elapsedSeconds = Math.floor((elapsedMilliseconds % 60000) / 1000);
+                timerElement.innerText = `Time : ${elapsedMinutes}m ${elapsedSeconds}s`;
+                }, 1000);
+  
+
+                $('#chatMessage').hide();  
+  
+
+  
+                // Call your Flask function  
+                $.post(createIndexUrl, { book_name: selectedBook })  
+                .done(function(response) {  
+                    // Handle success response  
+                    $('#chatMessage').text('Chat is ready!').show();  
+                    //clearInterval(interval);  
+                    //$('#progressBar').css('width', '100%'); 
+                    // Hide the spinner after receiving response  
+                    spinner.style.display = 'none'; 
+                    clearInterval(timerInterval); // Stop the timer 
+    
+                    // Get the final elapsed time  
+                    const elapsedMilliseconds = Date.now() - startTime;
+                    const elapsedMinutes = Math.floor(elapsedMilliseconds / 60000);
+                    const elapsedSeconds = Math.floor((elapsedMilliseconds % 60000) / 1000);
+                    timerElement.innerText = `Time : ${elapsedMinutes}m ${elapsedSeconds}s`; // Show final time
+                    
+               })  
+                .fail(function() {  
+                    // Handle error response  
+                    alert('Error generating chat!');  
+                    spinner.style.display = 'none';  
+                    //clearInterval(interval);  
+                    clearInterval(timerInterval); // Stop the timer
+                    const elapsedMilliseconds = Date.now() - startTime;
+                    const elapsedMinutes = Math.floor(elapsedMilliseconds / 60000);
+                    const elapsedSeconds = Math.floor((elapsedMilliseconds % 60000) / 1000);
+                    timerElement.innerText = `Time : ${elapsedMinutes}m ${elapsedSeconds}s`; // Show final time 
+                    alert('An error occurred while fetching the answer.'); // Notify user of error    
+                });  
+            });  
+        });  
+    </script> 
+ 
+</body>  
+</html>  

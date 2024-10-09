@@ -1,0 +1,289 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* The sidebar menu */
+/* styles.css */  
+  
+.sidebar {  
+  transition: width 0.3s;  
+}  
+
+.sidebar .hidden {  
+  display: none;  
+}  
+
+.sidebar.expanded {  
+  width: 20rem; /* w-64 */  
+}  
+
+.sidebar.collapsed {  
+  width: 3rem; /* w-16 */  
+}  
+
+.p-2 {  
+  padding: 0.5rem; /* Adjust padding */  
+}  
+
+.hover\:bg-gray-200:hover {  
+  background-color: #e2e8f0; /* Light gray on hover */  
+}  
+
+.icons {
+  fill: #0078D4;
+}
+  
+
+  .btnconfig:hover {
+    background-color: #444;
+  }
+
+  .btnconfig {
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #0078D4;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+  }
+
+  #sendButton{
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #0078D4;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+  }
+  
+  /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+  #main {
+    /*transition: margin-left .5s; /* If you want a transition effect */
+    padding: 20px;
+    background-color: white;
+
+    /*testing collapse */
+
+  }
+
+  /*-----------------------collapse chat ----------- */
+/* Main container */  
+/* Main container */  
+#main {  
+  display: flex; /* Use flexbox for layout */  
+}  
+
+/* Chat styles */  
+#chat {  
+  transition: opacity 0.3s; /* Smooth transition */  
+}  
+
+#chat.hidden {  
+  display: none; /* Hides the chat div */  
+}  
+
+#toggleButton_chat {
+  border: 2px solid #0078D4; /* Add a border with orange color */
+  border-radius: 0.375rem; /* Rounded corners */
+  padding: 0.2rem; /* Padding around the text */
+}
+
+#toggleButton_chat:hover {
+  background-color: #0078D4; /* Change background color on hover */
+  color: white; /* Change text color on hover */
+}
+
+
+
+
+ 
+
+
+/*---------------------------------- */
+  /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+  @media screen and (max-height: 450px) {
+    .sidebar {padding-top: 15px;}
+    .sidebar a {font-size: 18px;}
+  }
+
+.summary_and_chat{
+    display: flex; /* Use flexbox for side-by-side layout */  
+    width: 100%; /* Ensure it takes full width of the container */  
+    margin-top: 1rem; /* Optional: Add margin for spacing */
+}  
+  
+/*.summary{  
+  flex: 0 0 70%; /* Take 70% of the width   
+  padding: 1rem; /* Adjust padding as needed 
+  background-color: white; 
+} */ 
+
+ 
+  
+.chat_only {  
+    flex: 0 0 30%; /* Take 30% of the width */ 
+    border: 1px solid #ddd; /* Optional: Add a border for better visibility */  
+    border-radius: 0.375rem; /* Optional: Match rounded corners */  
+    padding: 1rem; /* Adjust padding as needed */  
+    margin-top: 1rem; /* Optional: Add margin for spacing */  
+    overflow-y: auto; /* Allow scrolling if content overflows */  
+    height: 12rem; /* Set a fixed height */  
+}  
+
+* {  
+  box-sizing: border-box;  
+}  
+
+.spinner {  
+  border: 4px solid rgba(0, 0, 0, 0.1);  
+  border-left-color: #000;  
+  border-radius: 50%;  
+  width: 20px;  
+  height: 20px;  
+  animation: spin 1s linear infinite;  
+  display: inline-block;  
+}  
+
+@keyframes spin {  
+  to {  
+      transform: rotate(360deg);  
+  }  
+}  
+
+/* styles.css */  
+.chat-response-text h1,  
+.chat-response-text h2,  
+.chat-response-text h3,  
+.chat-response-text h4,  
+.chat-response-text h5,  
+.chat-response-text h6,  
+.chat-response-text p {  
+    font-size: initial !important;  
+    font-weight: initial !important;  
+    margin: 0 !important;  
+}  
+
+
+#toggleButton {  
+  margin-bottom: 10px;  
+  cursor: pointer;  
+}  
+
+#summaryText {  
+  transition: display 0.5s ease; /* Optional smooth transition */  
+}  
+
+#contextReports {  
+  width: 100%; /* Adjust as needed */  
+  max-height: 300px; /* Fixed height for the div */  
+  overflow-y: auto; /* Add a vertical scrollbar if content exceeds the height */  
+  border: 1px solid #ccc; /* Border around the div */  
+  padding: 10px; /* Optional padding */  
+}  
+
+table {  
+  width: 100%; /* Make the table take the full width of the div */  
+  border-collapse: collapse; /* Merge borders for a cleaner look */  
+  
+}  
+
+th, td {  
+  border: 1px solid #ddd; /* Border for each table cell */  
+  padding: 8px; /* Padding inside cells */  
+  text-align: left; /* Align text to the left */  
+  vertical-align: top; /* Align text to the top */  
+}  
+
+th {  
+  background-color: #f2f2f2; /* Background color for the header */  
+}  
+
+#chatResponse {  
+  width: 100%; /* Adjust as needed */  
+  max-height: 300px; /* Fixed height for the div */  
+  overflow-y: auto; /* Add a vertical scrollbar if content exceeds the height */  
+  border: 1px solid #ccc; /* Border around the div */  
+  padding: 10px; /* Optional padding */  
+}  
+
+.response-details {  
+  border: 1px solid #ccc; /* Optional border */  
+  padding: 10px; /* Padding */  
+  background-color: #f9f9f9; /* Background color */  
+  margin-top: 10px; /* Margin to separate from chat response */  
+}  
+
+.chat-response-text {  
+  border: 1px solid #ccc; /* Optional border */  
+  padding: 10px; /* Padding */  
+  background-color: #f9f9f9; /* Background color */  
+  margin-top: 10px; /* Margin to separate from chat response */  
+}  
+
+.context-reports {  
+  border: 1px solid #ccc; /* Optional border */  
+  padding: 10px; /* Padding */  
+  background-color: #f9f9f9; /* Background color */  
+  margin-top: 10px; /* Margin to separate from chat response */  
+}  
+
+.spinner2 {  
+  display: flex;  
+  align-items: center;  
+  margin-top: 10px;  
+}  
+
+.spinner2 img {  
+  width: 80px; /* Adjust size of the penguin */  
+  margin-right: 10px; /* Space between the image and text */  
+} 
+
+.spinner1 {  
+  display: flex;  
+  align-items: center;  
+  margin-top: 10px;  
+}  
+
+.spinner1 img {  
+  width: 80px; /* Adjust size of the penguin */  
+  margin-right: 10px; /* Space between the image and text */  
+} 
+
+.spinner3 {  
+  display: flex;  
+  align-items: center;  
+  margin-top: 10px;  
+}  
+
+.spinner3 img {  
+  width: 80px; /* Adjust size of the penguin */  
+  margin-right: 10px; /* Space between the image and text */  
+} 
+
+
+.summary-reading-guides {  
+  margin: 0; /* Remove margin from the top */  
+  padding: 0; /* Remove padding */  
+}  
+
+.summary-reading-guides p {  
+  margin-bottom: 1em; /* Space between paragraphs */  
+}  
+
+.summary-reading-guides br {  
+  content: ''; /* Hide <br> elements */  
+  display: none; /* Prevent <br> from breaking lines */  
+}  
+
+#chat-settings{
+  padding: 1rem; /* p-4 */
+  border-bottom: 1px solid; /* border-b */
+  background-color: #3b82f6; /* bg-blue-500 */
+  color: #ffffff; /* text-white */
+  border-top-left-radius: 0.5rem; /* rounded-t-lg */
+  border-top-right-radius: 0.5rem; /* rounded-t-lg */
+  display: flex; /* flex */
+  justify-content: space-between; /* justify-between */
+  align-items: center; /* items-center */
+}
+
